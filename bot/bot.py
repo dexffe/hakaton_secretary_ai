@@ -3,6 +3,9 @@ from db.db import async_session
 from telebot import types
 from config import BOT_TOKEN
 from auth.auth import authenticate_user, register_user
+
+global ACCESS
+global FUNC1, FUNC2, FUNC3
 bot = telebot.TeleBot(BOT_TOKEN)
 
 bot.delete_webhook()
@@ -31,48 +34,114 @@ def send_welcome(message):
     bot.send_message(message.from_user.id, text, parse_mode='Markdown')
 
 
-
-
-def chek_markup(func1:bool, func2:bool, func3:bool) -> types.InlineKeyboardMarkup:
+def markup_change_format_file_and_password(Format_docx:bool, Format_pdf:bool, Password:bool) -> types.InlineKeyboardMarkup:
     global FUNC1, FUNC2, FUNC3        # необходимые глобальные переменные(чтобы их видел callback_inline()) для проверки состояния чекбоксов
-    FUNC1, FUNC2, FUNC3 = func1, func2, func3
+    FUNC1, FUNC2, FUNC3 = Format_docx, Format_pdf, Password
 
     markup = telebot.types.InlineKeyboardMarkup(row_width=1)       # создание пустого markup
 
-    text_func1 = 'func1: ✅' if func1 else 'func1: ⬜'
-    text_func2 = 'func2: ✅' if func2 else 'func2: ⬜'            # проверка, какой чекбокс включен, а какой нет
-    text_func3 = 'func3: ✅' if func3 else 'func3: ⬜'
+    text_func1 = 'Формат docx: ✅' if Format_docx else 'Формат docx: ⬜'
+    text_func2 = 'Формат pdf: ✅' if Format_pdf else 'Формат pdf: ⬜'            # проверка, какой чекбокс включен, а какой нет
+    text_func3 = 'Установить пароль: ✅' if Password else 'Установить пароль: ⬜'
+    text_func4 = 'Подтвердить'
 
-    markup_item1 = telebot.types.InlineKeyboardButton(text_func1, callback_data='func1')
-    markup_item2 = telebot.types.InlineKeyboardButton(text_func2, callback_data='func2') # создание верного чекбокс(вкл/выкл)
-    markup_item3 = telebot.types.InlineKeyboardButton(text_func3, callback_data='func3')
+    markup_item1 = telebot.types.InlineKeyboardButton(text_func1, callback_data='Format docx')
+    markup_item2 = telebot.types.InlineKeyboardButton(text_func2, callback_data='Format pdf') # создание верного чекбокс(вкл/выкл)
+    markup_item3 = telebot.types.InlineKeyboardButton(text_func3, callback_data='Password')
+    markup_item4 = telebot.types.InlineKeyboardButton(text_func4, callback_data='Confirm')
 
-    markup.add(markup_item1, markup_item2, markup_item3)
+    markup.add(markup_item1, markup_item2, markup_item3, markup_item4)
 
     return markup
 
 
-@bot.message_handler(commands=["text"])
-def default_test(message):
+def markup_redakt_unofficial_protocol(Meeting_participants:bool, Agendas:bool, Context_of_discussion:bool) -> types.InlineKeyboardMarkup:
+    global FUNC1, FUNC2, FUNC3        # необходимые глобальные переменные(чтобы их видел callback_inline()) для проверки состояния чекбоксов
+    FUNC1, FUNC2, FUNC3 = Meeting_participants, Agendas, Context_of_discussion
+
+    markup = telebot.types.InlineKeyboardMarkup(row_width=1)       # создание пустого markup
+
+    text_func1 = 'Участники совещания: ✅' if Meeting_participants else 'Участники совещания: ⬜'
+    text_func2 = 'Повестка дня: ✅' if Agendas else 'Повестка дня: ⬜'            # проверка, какой чекбокс включен, а какой нет
+    text_func3 = 'Контекст обсуждения каждого предложения: ✅' if Context_of_discussion else 'Контекст обсуждения каждого предложения: ⬜'
+    text_func4 = 'Подтвердить'
+
+    markup_item1 = telebot.types.InlineKeyboardButton(text_func1, callback_data='Meeting participants')
+    markup_item2 = telebot.types.InlineKeyboardButton(text_func2, callback_data='Agendas') # создание верного чекбокс(вкл/выкл)
+    markup_item3 = telebot.types.InlineKeyboardButton(text_func3, callback_data='Context of discussion')
+    markup_item4 = telebot.types.InlineKeyboardButton(text_func4, callback_data='Confirm')
+
+    markup.add(markup_item1, markup_item2, markup_item3, markup_item4)
+
+    return markup
+
+
+def chek_markup_protocol(Unofficial_protocol:bool, Official_protocol:bool, Transcript_of_the_meeting:bool) -> types.InlineKeyboardMarkup:
+    global FUNC1, FUNC2, FUNC3        # необходимые глобальные переменные(чтобы их видел callback_inline()) для проверки состояния чекбоксов
+    FUNC1, FUNC2, FUNC3 = Unofficial_protocol, Official_protocol, Transcript_of_the_meeting
+
+    markup = telebot.types.InlineKeyboardMarkup(row_width=1)       # создание пустого markup
+
+    text_func1 = 'Неофициальный протокол: ✅' if Unofficial_protocol else 'Неофициальный протокол: ⬜'
+    text_func2 = 'Официальный протокол: ✅' if Official_protocol else 'Официальный протокол: ⬜'            # проверка, какой чекбокс включен, а какой нет
+    text_func3 = 'Расшифровка совещания: ✅' if Transcript_of_the_meeting else 'Расшифровка совещания: ⬜'
+    text_func4 = 'Подтвердить'
+
+    markup_item1 = telebot.types.InlineKeyboardButton(text_func1, callback_data='Unofficial protocol')
+    markup_item2 = telebot.types.InlineKeyboardButton(text_func2, callback_data='Official protocol') # создание верного чекбокс(вкл/выкл)
+    markup_item3 = telebot.types.InlineKeyboardButton(text_func3, callback_data='Transcript of the meeting')
+    markup_item4 = telebot.types.InlineKeyboardButton(text_func4, callback_data='Confirm')
+
+    markup.add(markup_item1, markup_item2, markup_item3, markup_item4)
+
+    return markup
+
+
+
+def create_check_boxes(message, markup):
     bot.send_message(message.chat.id,
                      text="Выберите необходимые функции:",
-                     reply_markup=chek_markup(func1=False, func2=False, func3=False))
+                     reply_markup=markup)
 
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_inline(call):
     if call.message:
-        if call.data == 'func1' or call.data == 'func2' or call.data == 'func3':
-            if call.data == 'func1':
-                markup = chek_markup(not FUNC1, FUNC2, FUNC3)   # изменение состояния чекбокса (№ 1)
-            elif call.data == 'func2':
-                markup = chek_markup(FUNC1, not FUNC2, FUNC3)   # изменение состояния чекбокса (№ 2)
-            elif call.data == 'func3':
-                markup = chek_markup(FUNC1, FUNC2, not FUNC3)   # изменение состояния чекбокса (№ 3)
+        if call.data == 'Unofficial protocol' or call.data == 'Official protocol' or call.data == 'Transcript of the meeting':
+            if call.data == 'Unofficial protocol':
+                markup = chek_markup_protocol(not FUNC1, FUNC2, FUNC3)   # изменение состояния чекбокса (№ 1)
+            elif call.data == 'Official protocol':
+                markup = chek_markup_protocol(FUNC1, not FUNC2, FUNC3)   # изменение состояния чекбокса (№ 2)
+            elif call.data == 'Transcript of the meeting':
+                markup = chek_markup_protocol(FUNC1, FUNC2, not FUNC3)   # изменение состояния чекбокса (№ 3)
     
             bot.edit_message_text(chat_id=call.message.chat.id,
                                   message_id=call.message.message_id,
-                                  text="Выберите необходимые функции:",
+                                  text="Ваша аудиозапись обработана, в каком виде вам нужен протокол:",
+                                  reply_markup=markup)
+        if call.data == 'Meeting participants' or call.data == 'Agendas' or call.data == 'Context of discussion':
+            if call.data == 'Meeting participants':
+                markup = chek_markup_protocol(not FUNC1, FUNC2, FUNC3)  # изменение состояния чекбокса (№ 1)
+            elif call.data == 'Agendas':
+                markup = chek_markup_protocol(FUNC1, not FUNC2, FUNC3)  # изменение состояния чекбокса (№ 2)
+            elif call.data == 'Context of discussion':
+                markup = chek_markup_protocol(FUNC1, FUNC2, not FUNC3)  # изменение состояния чекбокса (№ 3)
+
+            bot.edit_message_text(chat_id=call.message.chat.id,
+                                  message_id=call.message.message_id,
+                                  text="Выберите необязательные поля для неофициального протокола:",
+                                  reply_markup=markup)
+        if call.data == 'Format docx' or call.data == 'Format pdf' or call.data == 'Password':
+            if call.data == 'Format docx':
+                markup = chek_markup_protocol(not FUNC1, FUNC2, FUNC3)  # изменение состояния чекбокса (№ 1)
+            elif call.data == 'Format pdf':
+                markup = chek_markup_protocol(FUNC1, not FUNC2, FUNC3)  # изменение состояния чекбокса (№ 2)
+            elif call.data == 'Password':
+                markup = chek_markup_protocol(FUNC1, FUNC2, not FUNC3)  # изменение состояния чекбокса (№ 3)
+
+            bot.edit_message_text(chat_id=call.message.chat.id,
+                                  message_id=call.message.message_id,
+                                  text="Выберите нужный(ые) формат(ы) и отметьте нужен ли пароль на документ:",
                                   reply_markup=markup)
         if call.data == 'Sign in':
             mes = bot.send_message(call.message.chat.id, 'Введите:\nЛогин\nПароль')
@@ -82,6 +151,12 @@ def callback_inline(call):
             mes = bot.send_message(call.message.chat.id, 'Зарегистрируйте:\nЛогин\nПароль')
             bot.register_next_step_handler(mes, log_in)
 
+        if call.data == 'Confirm':
+            if FUNC1:
+                create_check_boxes(markup_redakt_unofficial_protocol(FUNC1, FUNC2, FUNC3))
+            elif FUNC2:
+                create_check_boxes(markup_change_format_file_and_password(FUNC1, FUNC2, FUNC3))
+
 def sign_up(message):
     try:
         email = message.text.split('\n')[0]
@@ -90,6 +165,8 @@ def sign_up(message):
         print(user_id, email, password)
         authenticate_user(user_id, email, password, async_session)
         bot.send_message(message.from_user.id, 'Успешный вход')
+        mes = bot.send_message(message.chat.id, 'Отправьте аудиозапись совещания:')
+        bot.register_next_step_handler(mes, get_audio_file)
 
     except Exception:
         bot.send_message(message.from_user.id, 'Некорректный ввод')
@@ -104,16 +181,22 @@ def log_in(message):
         register_user(user_id, email, password, async_session)
         bot.send_message(message.from_user.id, 'Успешная регистрация')
 
+
     except Exception:
         bot.send_message(message.from_user.id, 'Некорректный ввод')
 
 
-# def audio_file(message):
-    # bot.send_audio(message.from_user.id, audio=open('audio.mp3', 'rb'))
+def get_audio_file(message):
+    audio_file = message.audio
+    bot.send_message(message.chat.id, 'Идет обработка...')
+    create_check_boxes(chek_markup_protocol(FUNC1, FUNC2, FUNC3))
+
 
 
 @bot.message_handler(func=lambda message: True)
 def answer(message):
+
+
     bot.send_message(message.from_user.id, 'Я вас не понимаю(')
 
 
