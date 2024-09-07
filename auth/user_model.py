@@ -7,6 +7,8 @@ metadata = MetaData()
 
 
 class User(Base):
+    __tablename__ = "user"
+    metadata = metadata
     id: Mapped[int] = mapped_column(
         Integer, primary_key=True
     )
@@ -16,3 +18,5 @@ class User(Base):
     password: Mapped[str] = mapped_column(
         String(length=1024), nullable=False
     )
+
+
