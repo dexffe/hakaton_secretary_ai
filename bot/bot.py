@@ -1,4 +1,5 @@
 import telebot
+from db.db import async_session
 from telebot import types
 from config import BOT_TOKEN
 from auth.auth import authenticate_user, register_user
@@ -75,18 +76,19 @@ def callback_inline(call):
                                   reply_markup=markup)
         if call.data == 'Sign in':
             mes = bot.send_message(call.message.chat.id, 'Введите:\nЛогин\nПароль')
-            bot.register_next_step_handler(mes, sign_in)
+            bot.register_next_step_handler(mes, sign_up)
 
         if call.data == 'Log in':
             mes = bot.send_message(call.message.chat.id, 'Зарегистрируйте:\nЛогин\nПароль')
             bot.register_next_step_handler(mes, log_in)
 
-def sign_in(message):
+def sign_up(message):
     try:
         email = message.text.split('\n')[0]
         password = message.text.split('\n')[1]
         user_id = message.from_user.id
-        authenticate_user(user_id, email, password)
+        print(user_id, email, password)
+        authenticate_user(user_id, email, password, async_session)
         bot.send_message(message.from_user.id, 'Успешный вход')
 
     except Exception:
@@ -98,7 +100,8 @@ def log_in(message):
         email = message.text.split('\n')[0]
         password = message.text.split('\n')[1]
         user_id = message.from_user.id
-        register_user(user_id, email, password)
+        print(user_id, email, password)
+        register_user(user_id, email, password, async_session)
         bot.send_message(message.from_user.id, 'Успешная регистрация')
 
     except Exception:
