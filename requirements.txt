@@ -4,4 +4,4 @@ pydantic-settings
 sqlalchemy~=2.0.29
 alembic
 asyncpg
-passlib
+pydub

@@ -27,6 +27,7 @@ async def register_user(id: int, email: str, password: str, async_session: async
 
         return 0
 
+
 async def authenticate_user(id: int, email: str, password: str, async_session: async_sessionmaker[AsyncSession]):
     async with async_session() as session:
         statement = select(User).filter(User.id == id and User.email == email and User.password == password)
