@@ -87,7 +87,8 @@ def sign_in(message):
         password = message.text.split('\n')[1]
         user_id = message.from_user.id
         authenticate_user(user_id, email, password)
-        bot.send_message(message.from_user.id, 'Успешно вошли в аккаунт')
+        bot.send_message(message.from_user.id, 'Успешный вход')
+
     except Exception:
         bot.send_message(message.from_user.id, 'Некорректный ввод')
 
@@ -98,11 +99,14 @@ def log_in(message):
         password = message.text.split('\n')[1]
         user_id = message.from_user.id
         register_user(user_id, email, password)
-        bot.send_message(message.from_user.id, 'Успешная регистрация аккаунта')
+        bot.send_message(message.from_user.id, 'Успешная регистрация')
+
     except Exception:
         bot.send_message(message.from_user.id, 'Некорректный ввод')
-        bot.register_next_step_handler('', log_in)
 
+
+# def audio_file(message):
+    # bot.send_audio(message.from_user.id, audio=open('audio.mp3', 'rb'))
 
 
 @bot.message_handler(func=lambda message: True)
@@ -111,7 +115,7 @@ def answer(message):
 
 
 if __name__ == '__main__':
-    bot.polling(none_stop=True)
+    bot.infinity_polling(none_stop=True)
 
 
 
