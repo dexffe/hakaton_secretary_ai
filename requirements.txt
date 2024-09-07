@@ -5,3 +5,4 @@ sqlalchemy~=2.0.29
 alembic
 asyncpg
 pydub
+telebot
