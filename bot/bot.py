@@ -1,7 +1,7 @@
 import telebot
 from telebot import types
 from config import BOT_TOKEN
-
+from auth.auth import authenticate_user, register_user
 bot = telebot.TeleBot(BOT_TOKEN)
 
 bot.delete_webhook()
@@ -14,7 +14,14 @@ bot.set_my_commands(commands)
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
-    bot.send_message(message.from_user.id, "Привет! Я бот секретарь с искусственным интеллектом")
+
+    markup1 = telebot.types.InlineKeyboardMarkup(row_width=2)
+    markup_item1 = telebot.types.InlineKeyboardButton('Войти', callback_data='Sign in')
+    markup_item2 = telebot.types.InlineKeyboardButton('Зарегистрироваться', callback_data='Log in')
+    markup1.add(markup_item1, markup_item2)
+
+    bot.send_message(message.from_user.id, "Привет! Я бот секретарь с искусственным интеллектом", reply_markup=markup1)
+
 
 
 @bot.message_handler(commands=['help'])
@@ -54,18 +61,47 @@ def default_test(message):
 @bot.callback_query_handler(func=lambda call: True)
 def callback_inline(call):
     if call.message:
-        if call.data == 'func1':
-            markup = chek_markup(not FUNC1, FUNC2, FUNC3)   # изменение состояния чекбокса (№ 1)
-        elif call.data == 'func2':
-            markup = chek_markup(FUNC1, not FUNC2, FUNC3)   # изменение состояния чекбокса (№ 2)
-        elif call.data == 'func3':
-            markup = chek_markup(FUNC1, FUNC2, not FUNC3)   # изменение состояния чекбокса (№ 3)
+        if call.data == 'func1' or call.data == 'func2' or call.data == 'func3':
+            if call.data == 'func1':
+                markup = chek_markup(not FUNC1, FUNC2, FUNC3)   # изменение состояния чекбокса (№ 1)
+            elif call.data == 'func2':
+                markup = chek_markup(FUNC1, not FUNC2, FUNC3)   # изменение состояния чекбокса (№ 2)
+            elif call.data == 'func3':
+                markup = chek_markup(FUNC1, FUNC2, not FUNC3)   # изменение состояния чекбокса (№ 3)
+    
+            bot.edit_message_text(chat_id=call.message.chat.id,
+                                  message_id=call.message.message_id,
+                                  text="Выберите необходимые функции:",
+                                  reply_markup=markup)
+        if call.data == 'Sign in':
+            mes = bot.send_message(call.message.chat.id, 'Введите:\nЛогин\nПароль')
+            bot.register_next_step_handler(mes, sign_in)
 
-        bot.edit_message_text(chat_id=call.message.chat.id,
-                              message_id=call.message.message_id,
-                              text="Выберите необходимые функции:",
-                              reply_markup=markup)
+        if call.data == 'Log in':
+            mes = bot.send_message(call.message.chat.id, 'Зарегистрируйте:\nЛогин\nПароль')
+            bot.register_next_step_handler(mes, log_in)
 
+def sign_in(message):
+    try:
+        email = message.text.split('\n')[0]
+        password = message.text.split('\n')[1]
+        user_id = message.from_user.id
+        authenticate_user(user_id, email, password)
+        bot.send_message(message.from_user.id, 'Успешно вошли в аккаунт')
+    except Exception:
+        bot.send_message(message.from_user.id, 'Некорректный ввод')
+
+
+def log_in(message):
+    try:
+        email = message.text.split('\n')[0]
+        password = message.text.split('\n')[1]
+        user_id = message.from_user.id
+        register_user(user_id, email, password)
+        bot.send_message(message.from_user.id, 'Успешная регистрация аккаунта')
+    except Exception:
+        bot.send_message(message.from_user.id, 'Некорректный ввод')
+        bot.register_next_step_handler('', log_in)
 
 
 
