@@ -3,6 +3,7 @@ from db.db import async_session
 from telebot import types
 from config import BOT_TOKEN
 from auth.auth import authenticate_user, register_user
+from docx import Document
 
 global ACCESS, audio_file
 global protocol_FUNC1, protocol_FUNC2, protocol_FUNC3
@@ -168,9 +169,13 @@ def callback_inline(call):
                                'Выберите нужный(ые) формат(ы) и отметьте нужен ли пароль на документ:')
         if call.data == 'Confirm format file':
             if protocol_FUNC1 and FUNC1:
-                bot.send_document(call.message.chat.id, open('Неофициальный протокол.docx', 'rb'), caption='Благодарим за использование, нужный(ые) вам документ(ы) прикреплен(ы) к этому сообщению')
+                name_file = 'Неофициальный протокол.docx'
+                create_file(name_file)
+                bot.send_document(call.message.chat.id, open(name_file, 'rb'), caption='Благодарим за использование, нужный(ые) вам документ(ы) прикреплен(ы) к этому сообщению')
             if protocol_FUNC2 and FUNC1:
-                bot.send_document(call.message.chat.id, open('Официальный протокол.docx', 'rb'), caption='Благодарим за использование, нужный(ые) вам документ(ы) прикреплен(ы) к этому сообщению')
+                name_file = 'Официальный протокол.docx'
+                create_file(name_file)
+                bot.send_document(call.message.chat.id, open(name_file, 'rb'), caption='Благодарим за использование, нужный(ые) вам документ(ы) прикреплен(ы) к этому сообщению')
 
 
 
@@ -208,6 +213,21 @@ def get_audio_file(message):
     audio_file = message.audio
     bot.send_message(message.chat.id, 'Идет обработка...')
     create_check_boxes(message, chek_markup_protocol(False, False, False), "Ваша аудиозапись обработана, в каком виде вам нужен протокол:")
+
+
+def create_file(name_file):
+    doc = Document()
+
+    doc.add_heading('Document Title', 0)
+
+    p = doc.add_paragraph('A plain paragraph having some')
+    p.add_run('bold').bold = True
+    p.add_run('and some ')
+    p.add_run('italic.').italic = True
+
+    doc.add_page_break()
+
+    doc.save(name_file)
 
 
 @bot.message_handler(func=lambda message: True)
